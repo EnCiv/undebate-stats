@@ -30,7 +30,7 @@ let arr = []
         this.db = client.db()
         MongodbClient = client.db()
     })
-app.get('/cool',async (req,res) => {
+app.get('/home',async (req,res) => {
     res.write("hello")
     res.write(`\nHere is a sample date 2020-06-30`)
     res.write('\nIf you want just todays recordings leave url queries blank')
@@ -76,6 +76,7 @@ function SearchDb(start, end ){
             console.log("The length of items:", items.length)
             const unique = [...new Set(arr.map(item => item.Url))]
             let recorderList=unique.filter(target => target.split("-").includes("recorder"))
+            //console.log(unique)
             recorderList.forEach(target => {
                 let opSo = arr.filter(item => item.Url === target).map(item => JSON.parse(item.browser).os.name)
                 let browser = arr.filter(item => item.Url === target).map(item => JSON.parse(item.browser).browser.name)
@@ -90,6 +91,7 @@ function SearchDb(start, end ){
                 )
             }
             )
+            console.log("done")
         })
 }
 /*todo:
