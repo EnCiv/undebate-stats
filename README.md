@@ -7,11 +7,11 @@ give it a minute to load
 
 Recording Journey with Logs-
 
-get camera info - reactCameraRecorder
-preamble agree - Undebate preambleAgreed true
-begin button - Undebate.beginButton
-next speaker ............
-undebate is finished - Undebate.finished
-the user pressed the upload butto - Undebate.onUserUpload
-the user has successfully uploaded- notifyOfNewParticipant
+get camera info - reactCameraRecorder  
+preamble agree - Undebate preambleAgreed true  
+begin button - Undebate.beginButton  
+next speaker ............  
+undebate is finished - Undebate.finished  
+the user pressed the upload butto - Undebate.onUserUpload  
+the user has successfully uploaded- notifyOfNewParticipant  
  
