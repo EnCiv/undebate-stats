@@ -1,6 +1,6 @@
 To run, type in: npm run dev
 
-Type in http://localhost:1234/home?from=2020-08-17&to=2020-08-19
+Type in http://localhost:1234/home?from=2020-08-31&to=2020-09-09  
 
 give it a minute to load
 
