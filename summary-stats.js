@@ -1,3 +1,4 @@
+const _ = require("lodash")
 const MongoClient = require('mongodb').MongoClient
 let MongodbClient
 require("dotenv").config()
@@ -26,18 +27,21 @@ let SearchDba = function(start, end ){
 
                  let BrowserLogs = items.filter( target => target.source === "browser")
                  let NodeLogs = items.filter( target => target.source === "node")
+                 let runningClient = BrowserLogs.filter( target => target.data[1] === "client main running on browser" && target.data.length > 3)
                  let preambleAgreed = BrowserLogs.filter(target => target.data[1] === "Undebate preambleAgreed true")
                  let beginButton = BrowserLogs.filter(target => target.data[1] === "Undebate.beginButton")
                  let finished = BrowserLogs.filter(target => target.data[1] === "Undebate.finished")
                  let userUpload = BrowserLogs.filter(target => target.data[1] === "Undebate.onUserUpload")
                  //let preambleAgreedNode = NodeLogs.filter(target => target.data[1] === preambleAgreed[0].data[2].socketId)
-
-                 //console.log("tis is a node log", NodeLogs)
-                 console.log("amount of people that agreed to preamble", preambleAgreed[0].data[2].socketId)
-                 console.log("amount of people that agreed to preamble", preambleAgreed.length)
-                 console.log("amount of people that began:", beginButton.length )
-                 console.log("people that finished",finished.length)
-                 console.log("people that uploaded", userUpload.length)
+                
+                 console.log("\namount of people that agreed to preamble", preambleAgreed.length)
+                 socketIdParse(runningClient, preambleAgreed)
+                 console.log("\namount of people that began:", beginButton.length )
+                 socketIdParse(runningClient, beginButton)
+                 console.log("\npeople that finished",finished.length)
+                 socketIdParse(runningClient, finished)
+                 console.log("\npeople that uploaded", userUpload.length)
+                 socketIdParse(runningClient, userUpload)                 
                  
                  //console.log("Get requests are: " + counter)
                  //console.log("The length of items:", items.length)
@@ -67,4 +71,42 @@ let SearchDba = function(start, end ){
              })
      }
 
+let socketIdParse= function(userInfoStage,recordingStage){
+    let osUser = []
+    let browserUser= []
+    let typeUser = []
+    for(i=0; i<recordingStage.length; i++){
+        let socketId = recordingStage[i].data[2].socketId
+        matchRunCli(userInfoStage, socketId, osUser, browserUser, typeUser)
+     }
+    let osFreq= _.countBy(osUser)
+    let browserFreq = _.countBy(browserUser)
+    let typeFreq = _.countBy(typeUser)
+    console.log(osFreq)
+    console.log(browserFreq)
+    console.log(typeFreq)
+}
+
+/*
+{
+    name: 'chrome',
+    version: [ 84, 0, 4147, 135 ],
+    versionString: '84.0.4147.135'
+  }
+  just keeping the name field
+*/
+
+let matchRunCli = function(userInfoStage,recordingStageId, osArr, browserArr, typeArr){
+     let userInfo = userInfoStage.find(target => target.data[4].socketId === recordingStageId)
+     if(userInfo){
+        osArr.push(userInfo.data[3].os.name)
+        browserArr.push(userInfo.data[3].browser.name)
+        typeArr.push(userInfo.data[3].type)
+     }
+
+     //console.log("device info for those that agreed to preamble", userInfo, recordingStageId)
+}
 module.exports = { search:SearchDba}
+
+//match socket id then
+//return total devices for that phase
