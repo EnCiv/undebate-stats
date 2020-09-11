@@ -7,6 +7,7 @@ give it a minute to load
 
 Recording Journey with Logs-
 
+client running - client main running on browser
 get camera info - reactCameraRecorder  
 preamble agree - Undebate preambleAgreed true  
 begin button - Undebate.beginButton  
