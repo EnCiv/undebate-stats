@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import { FunnelChart } from 'react-funnel-pipeline'
+import 'react-funnel-pipeline/dist/index.css'
 import logo from './logo.svg';
 import './App.css';
 
@@ -7,7 +9,15 @@ class App extends Component {
   state = {
     startDate: '',
     endDate:'',
-    responseToDate: ''
+    responseToDate: '',
+    funnelData: [
+      { name: 'Awareness', value: 252 },
+      { name: 'Interest', value: 105 },
+      { name: 'Consideration', value: 84 },
+      { name: 'Evaluation', value: 72 },
+      { name: 'Commitment', value: 19 },
+      { name: 'Sale', value: 10 }
+    ],
   }
 
   componentDidMount(){
@@ -39,9 +49,11 @@ class App extends Component {
     })
     
     const body = await response.text()
-
-    console.log("-------",body)
-    this.setState({ responseToDate: body})
+    const jsonBody = JSON.parse(body)
+    console.log("-------",jsonBody.text)
+    //this.setState({ responseToDate: body.text, funnelData: body.funnelData})
+    this.setState({ responseToDate: jsonBody.text})
+    this.setState({ funnelData: jsonBody.funnelData})
   }
 
 
@@ -73,6 +85,9 @@ class App extends Component {
         <button type="submit">Submit</button>
       </form>
       <p style={{whiteSpace: "pre-line"}}>{this.state.responseToDate}</p>
+      <FunnelChart 
+        data={this.state.funnelData}
+      />
     </div>
     )
   };

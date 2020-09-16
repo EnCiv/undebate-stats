@@ -57,6 +57,7 @@ app.post('/api/test', (req,res) => {
     let result= logCollection.find({ startTime: { $gte:new Date(start.toISOString()),$lte: new Date(end.toISOString()) }})
     result.toArray((err, items) => {
         let counter = 0
+        let funnelData = []
         items.forEach(element => {
             void (element.data[0] === "GET" && (counter += 1, arr.push({
                 'Method': element.data[0],
@@ -74,28 +75,40 @@ app.post('/api/test', (req,res) => {
         let finished = BrowserLogs.filter(target => target.data[1] === "Undebate.finished")
         let userUpload = BrowserLogs.filter(target => target.data[1] === "Undebate.onUserUpload")
         
-        console.log("\namount of people that agreed to preamble", preambleAgreed.length)
-        textDisplay += "\namount of people that agreed to preamble " + preambleAgreed.length
+        let uniqueBB = uniqueSockets(beginButton)
+        let uniquePA = uniqueSockets(preambleAgreed)
+        let uniqueF = uniqueSockets(finished)
+        let uniqueUU = uniqueSockets(userUpload)
+
+        console.log("\namount of people that agreed to preamble", uniquePA.length)
+        textDisplay += "\namount of people that agreed to preamble " + uniquePA.length
         textDisplay += socketIdParse(runningClient, preambleAgreed)
-        console.log("\namount of people that began:", beginButton.length )
-        textDisplay += "\namount of people that began: "+ beginButton.length
+        console.log("\namount of people that began:", uniqueBB.length )
+        textDisplay += "\namount of people that began: "+ uniqueBB.length
         textDisplay += socketIdParse(runningClient, beginButton)
-        console.log("\npeople that finished",finished.length)
-        textDisplay += "\npeople that finished " + finished.length
+        console.log("\npeople that finished",uniqueF.length)
+        textDisplay += "\npeople that finished " + uniqueF.length
         textDisplay += socketIdParse(runningClient, finished)
-        console.log("\npeople that uploaded", userUpload.length)
-        textDisplay += "\npeople that uploaded " + userUpload.length
+        console.log("\npeople that uploaded", uniqueUU.length)
+        textDisplay += "\npeople that uploaded " + uniqueUU.length
         textDisplay += socketIdParse(runningClient, userUpload)                 
         
         //console.log("Get requests are: " + counter)
         //console.log("The length of items:", items.length)
-        
+        /*
+        below was used for this
         preambleAgreed = "amount of people that agreed to preamble "+ preambleAgreed.length
         beginButton = "amount of people that began: " + beginButton.length
         finished = "people that finished " + finished.length
         userUpload = "people that uploaded " + userUpload.length
+        */
 
-        res.send(textDisplay)
+        funnelData.push({'name':'beginButton', 'value':uniqueBB.length})
+        funnelData.push({'name':'preambleAgreed', 'value':uniquePA.length})
+        funnelData.push({'name':'finished', 'value':uniqueF.length})
+        funnelData.push({'name':'userUpload', 'value':uniqueUU.length})
+
+        res.send({'text':textDisplay,'funnelData': funnelData})
         res.end()
         const unique = [...new Set(arr.map(item => item.Url))]
         let recorderList=unique.filter(target => target.split("-").includes("recorder"))
@@ -118,14 +131,31 @@ app.post('/api/test', (req,res) => {
     })
 })
 
+let uniqueSockets = function(recordingStage){
+    let socketIdList=[]
+    for(let i=0; i<recordingStage.length; i++){
+        let socketId = recordingStage[i].data[2].socketId
+        socketIdList.push(socketId)
+     }
+    let uniqueSockets = [... new Set(socketIdList)]
+    return uniqueSockets
+}
+
 let socketIdParse= function(userInfoStage,recordingStage){
     let osUser = []
     let browserUser= []
     let typeUser = []
+    let socketIdList=[]
     for(let i=0; i<recordingStage.length; i++){
         let socketId = recordingStage[i].data[2].socketId
-        matchRunCli(userInfoStage, socketId, osUser, browserUser, typeUser)
+        socketIdList.push(socketId)
      }
+    let uniqueSockets = [... new Set(socketIdList)]
+
+    for(let i=0;i<uniqueSockets.length;i++){
+        let socketId = uniqueSockets[i]
+        matchRunCli(userInfoStage, socketId, osUser, browserUser, typeUser)
+    }
     let osFreq= _.countBy(osUser)
     let browserFreq = _.countBy(browserUser)
     let typeFreq = _.countBy(typeUser)
@@ -141,7 +171,12 @@ let socketIdParse= function(userInfoStage,recordingStage){
 
 let matchRunCli = function(userInfoStage,recordingStageId, osArr, browserArr, typeArr){
     let userInfo = userInfoStage.find(target => target.data[4].socketId === recordingStageId)
+    console.log(recordingStageId)
+
     if(userInfo){
+        if(userInfo.data[1]==="Undebate.onUserUpload"){
+            console.log("user upload ",recordingStageId)
+        }
        osArr.push(userInfo.data[3].os.name)
        browserArr.push(userInfo.data[3].browser.name)
        typeArr.push(userInfo.data[3].type)
