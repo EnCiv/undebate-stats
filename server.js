@@ -47,9 +47,10 @@ app.post('/api/world', (req,res) => {
 })
 
 app.post('/api/test', (req,res) => {
+    let textDisplay = ""
     console.log(req.body)
-    const start = new Date("2020-08-31")
-    const end = new Date("2020-09-09")
+    const start = new Date(req.body.startDate)
+    const end = new Date(req.body.endDate)
     //let bro = Searching(from.toISOString(),to.toISOString()).finished
     //res.send(req.body);
     let logCollection = MongodbClient.collection('logs')
@@ -74,23 +75,28 @@ app.post('/api/test', (req,res) => {
         let userUpload = BrowserLogs.filter(target => target.data[1] === "Undebate.onUserUpload")
         
         console.log("\namount of people that agreed to preamble", preambleAgreed.length)
-        socketIdParse(runningClient, preambleAgreed)
+        textDisplay += "\namount of people that agreed to preamble " + preambleAgreed.length
+        textDisplay += socketIdParse(runningClient, preambleAgreed)
         console.log("\namount of people that began:", beginButton.length )
-        socketIdParse(runningClient, beginButton)
+        textDisplay += "\namount of people that began: "+ beginButton.length
+        textDisplay += socketIdParse(runningClient, beginButton)
         console.log("\npeople that finished",finished.length)
-        socketIdParse(runningClient, finished)
+        textDisplay += "\npeople that finished " + finished.length
+        textDisplay += socketIdParse(runningClient, finished)
         console.log("\npeople that uploaded", userUpload.length)
-        socketIdParse(runningClient, userUpload)                 
+        textDisplay += "\npeople that uploaded " + userUpload.length
+        textDisplay += socketIdParse(runningClient, userUpload)                 
         
         //console.log("Get requests are: " + counter)
         //console.log("The length of items:", items.length)
-        preambleAgreed = "amount of people that agreed to preamblem "+ preambleAgreed.length
+        
+        preambleAgreed = "amount of people that agreed to preamble "+ preambleAgreed.length
         beginButton = "amount of people that began: " + beginButton.length
         finished = "people that finished " + finished.length
         userUpload = "people that uploaded " + userUpload.length
 
-        res.send(preambleAgreed)
-
+        res.send(textDisplay)
+        res.end()
         const unique = [...new Set(arr.map(item => item.Url))]
         let recorderList=unique.filter(target => target.split("-").includes("recorder"))
         //console.log("Unique Recording Link Visits:",recorderList)
@@ -123,9 +129,14 @@ let socketIdParse= function(userInfoStage,recordingStage){
     let osFreq= _.countBy(osUser)
     let browserFreq = _.countBy(browserUser)
     let typeFreq = _.countBy(typeUser)
-    console.log(osFreq)
-    console.log(browserFreq)
-    console.log(typeFreq)
+    
+    let textDisplay= "" 
+    textDisplay+= "\n" + JSON.stringify(osFreq)
+    textDisplay+= "\n" + JSON.stringify(browserFreq)
+    textDisplay+= "\n" + JSON.stringify(typeFreq)
+    textDisplay+= "\n"
+
+     return textDisplay
 }
 
 let matchRunCli = function(userInfoStage,recordingStageId, osArr, browserArr, typeArr){

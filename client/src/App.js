@@ -5,9 +5,6 @@ import './App.css';
 class App extends Component {
 
   state = {
-    response: '',
-    post: '',
-    responseToPost: '',
     startDate: '',
     endDate:'',
     responseToDate: ''
@@ -28,21 +25,6 @@ class App extends Component {
     return body;
   }
 
-  handleSubmit = async e => {
-    e.preventDefault()
-    const response = await fetch('/api/world', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({post: this.state.post})
-    })
-
-    const body = await response.text()
-
-    this.setState({ responseToPost: body})
-  }
-
   handleDates = async e => {
     e.preventDefault()
     const response = await fetch('/api/test', {
@@ -55,9 +37,10 @@ class App extends Component {
         endDate:this.state.endDate
       })
     })
-
+    
     const body = await response.text()
 
+    console.log("-------",body)
     this.setState({ responseToDate: body})
   }
 
@@ -68,47 +51,28 @@ class App extends Component {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          <code>EnCiv Analytics</code>
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
-      <p>{this.state.response}</p>
-      <form onSubmit= {this.handleSubmit}>
-        <p>
-          <strong>Post to Server:</strong>
-        </p>
-        <input
-          type="text"
-          value={this.state.post}
-          onChange={e => this.setState({ post: e.target.value})}
-        />
-        <button type="submit">Submit</button>
-      </form>
-      <p>{this.state.responseToPost}</p>
       <form onSubmit={this.handleDates}>
         <p>
           <strong>Input Dates</strong>
         </p>
         <input
           type="text"
+          placeholder="2020-08-31"
           value={this.state.startDate}
           onChange= { e => this.setState({startDate:e.target.value})}
         />
         <input
           type="text"
+          placeholder="2020-09-09"
           value={this.state.endDate}
           onChange = {e => this.setState({endDate: e.target.value})}
         />
         <button type="submit">Submit</button>
       </form>
-      <p>{this.state.responseToDate}</p>
+      <p style={{whiteSpace: "pre-line"}}>{this.state.responseToDate}</p>
     </div>
     )
   };
