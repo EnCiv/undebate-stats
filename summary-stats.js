@@ -12,9 +12,11 @@ MongoClient.connect(env).then(client => {
     MongodbClient = client.db()
 })
 
-let SearchDba = function(start, end ){
+let SearchDba = async function(start, end ){
              console.log("date on query", start, end)
-             MongodbClient.collection('logs').find({ startTime: { $gte:new Date(start),$lte: new Date(end) }}).toArray((err, items) => {
+             let logCollection = MongodbClient.collection('logs')
+             let result=await logCollection.find({ startTime: { $gte:new Date(start),$lte: new Date(end) }})
+             result.toArray((err, items) => {
                  let counter = 0
                  items.forEach(element => {
                      void (element.data[0] === "GET" && (counter += 1, arr.push({
