@@ -108,26 +108,28 @@ app.post('/api/test', (req,res) => {
         funnelData.push({'name':'finished', 'value':uniqueF.length})
         funnelData.push({'name':'userUpload', 'value':uniqueUU.length})
 
-        res.send({'text':textDisplay,'funnelData': funnelData})
-        res.end()
         const unique = [...new Set(arr.map(item => item.Url))]
         let recorderList=unique.filter(target => target.split("-").includes("recorder"))
         //console.log("Unique Recording Link Visits:",recorderList)
+        let recorderLinks = ''
 
         recorderList.forEach(target => {
             let opSo = arr.filter(item => item.Url === target).map(item => JSON.parse(item.browser).os.name)
             let browser = arr.filter(item => item.Url === target).map(item => JSON.parse(item.browser).browser.name)
             let type = arr.filter(item => item.Url === target).map(item => JSON.parse(item.browser).type)
-            /*console.log(
-                "\nUrl information for: ",
-                target + " has ",
-                arr.filter(item => item.Url === target).length + " visit(s)",
-                "\nOperating Software: " + opSo,
-                "\nBrowser: " + browser,
-                "\nDevice: " + type,
-            )*/
+            recorderLinks+=
+                "\nUrl information for: "+
+                target + " has "+
+                arr.filter(item => item.Url === target).length + " visit(s)"+
+                "\nOperating Software: " + opSo+
+                "\nBrowser: " + browser+
+                "\nDevice: " + type
         }
         )
+        textDisplay += recorderLinks
+        res.send({'text':textDisplay,'funnelData': funnelData})
+        res.end() 
+
     })
 })
 
