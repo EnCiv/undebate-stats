@@ -49,8 +49,9 @@ app.post('/api/world', (req,res) => {
 app.post('/api/test', (req,res) => {
     let textDisplay = ""
     console.log(req.body)
-    const start = new Date(req.body.startDate)
-    const end = new Date(req.body.endDate)
+    const {body:{startDate,endDate}} = req 
+    const start = new Date(startDate)
+    const end = new Date(endDate)
     //let bro = Searching(from.toISOString(),to.toISOString()).finished
     //res.send(req.body);
     let logCollection = MongodbClient.collection('logs')
@@ -75,11 +76,15 @@ app.post('/api/test', (req,res) => {
         let finished = BrowserLogs.filter(target => target.data[1] === "Undebate.finished")
         let userUpload = BrowserLogs.filter(target => target.data[1] === "Undebate.onUserUpload")
         
+        let uniqueRC = uniqueSocketsRC(runningClient)
         let uniqueBB = uniqueSockets(beginButton)
         let uniquePA = uniqueSockets(preambleAgreed)
         let uniqueF = uniqueSockets(finished)
         let uniqueUU = uniqueSockets(userUpload)
 
+        console.log("\namount of people that landed on the page", uniqueRC.length)
+        textDisplay += "\namount of people that landed on page " + uniqueRC.length
+        //textDisplay += socketIdParse(runningClient, runningClient)
         console.log("\namount of people that agreed to preamble", uniquePA.length)
         textDisplay += "\namount of people that agreed to preamble " + uniquePA.length
         textDisplay += socketIdParse(runningClient, preambleAgreed)
@@ -103,6 +108,7 @@ app.post('/api/test', (req,res) => {
         userUpload = "people that uploaded " + userUpload.length
         */
 
+       funnelData.push({'name':'beginButton', 'value':uniqueRC.length})
         funnelData.push({'name':'beginButton', 'value':uniqueBB.length})
         funnelData.push({'name':'preambleAgreed', 'value':uniquePA.length})
         funnelData.push({'name':'finished', 'value':uniqueF.length})
@@ -132,6 +138,16 @@ app.post('/api/test', (req,res) => {
 
     })
 })
+
+let uniqueSocketsRC = function(recordingStage){
+    let socketIdList=[]
+    for(let i=0; i<recordingStage.length; i++){
+        let socketId = recordingStage[i].data[4].socketId
+        socketIdList.push(socketId)
+     }
+    let uniqueSockets = [... new Set(socketIdList)]
+    return uniqueSockets
+}
 
 let uniqueSockets = function(recordingStage){
     let socketIdList=[]
