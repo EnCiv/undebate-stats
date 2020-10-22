@@ -108,7 +108,7 @@ app.post('/api/test', (req,res) => {
         userUpload = "people that uploaded " + userUpload.length
         */
 
-       funnelData.push({'name':'beginButton', 'value':uniqueRC.length})
+        funnelData.push({'name':'beginButton', 'value':uniqueRC.length})
         funnelData.push({'name':'beginButton', 'value':uniqueBB.length})
         funnelData.push({'name':'preambleAgreed', 'value':uniquePA.length})
         funnelData.push({'name':'finished', 'value':uniqueF.length})
@@ -127,9 +127,9 @@ app.post('/api/test', (req,res) => {
                 "\nUrl information for: "+
                 target + " has "+
                 arr.filter(item => item.Url === target).length + " visit(s)"+
-                "\nOperating Software: " + opSo+
-                "\nBrowser: " + browser+
-                "\nDevice: " + type
+                "\nOperating Software: " + JSON.stringify(_.countBy(opSo))+
+                "\nBrowser: " + JSON.stringify(_.countBy(browser))+
+                "\nDevice: " + JSON.stringify(_.countBy(type))
         }
         )
         textDisplay += recorderLinks

@@ -52,7 +52,7 @@ class App extends Component {
     const body = await response.text()
     const jsonBody = JSON.parse(body)
     console.log("-------",jsonBody.text)
-    const {jsonBody:{text,funnelData}} = jsonBody 
+    const {text,funnelData} = jsonBody 
     this.setState({ responseToDate: text, funnelData: funnelData})
   }
 
